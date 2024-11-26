@@ -4,9 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class ProfileModel extends CI_Model {
 
     public function get_user_profile($userId) {
-
-
-        $this->db->select('user.id, user.name, user.gender, user.email, user.phone, user.income, user.height, user.dob, GROUP_CONCAT(DISTINCT occupation.occupation) as occupations, GROUP_CONCAT(DISTINCT education.education) as educations');
+        $this->db->select('user.id, user.name, user.gender, user.email, user.phone, user.income, user.height, user.dob, user.img, GROUP_CONCAT(DISTINCT occupation.occupation) as occupations, GROUP_CONCAT(DISTINCT education.education) as educations');
         $this->db->from('user');
         $this->db->join('occupation', 'user.id = occupation.user_id', 'left');
         $this->db->join('education', 'user.id = education.user_id', 'left');
@@ -74,5 +72,10 @@ class ProfileModel extends CI_Model {
         }
 
        return "success";
+    }
+
+    public function updateUser($userId, $data)
+    {
+        return $this->db->where('id', $userId)->update('user', $data);
     }
 }

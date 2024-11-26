@@ -117,4 +117,72 @@ class Profile extends CI_Controller
             ]);
         }
     }
+
+    public function uploadImage()
+    {
+        session_start();
+
+        $userId = $_SESSION["user_id"];
+
+        if (empty($_FILES['image']['name'])) {
+            echo json_encode(['status' => 'error', 'message' => 'No image file selected.']);
+            return;
+        }
+
+        $config['upload_path'] = './uploads';
+        $config['allowed_types'] = 'jpg|jpeg|png';
+        $config['file_name'] =  time() . '_' . $_FILES['image']['name'];
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('image')) {
+            echo json_encode(['status' => 'error', 'message' => $this->upload->display_errors('', '')]);
+            return;
+        }
+
+        // Get uploaded file data
+        $fileData = $this->upload->data();
+
+        // Save image path to database
+        $imagePath = 'uploads/' . $fileData['file_name'];
+        $this->load->model('ProfileModel');
+        $updateResult = $this->ProfileModel->updateUser($userId, ['img' => $imagePath]);
+
+        if ($updateResult) {
+            echo json_encode(['status' => 'success', 'message' => 'Image uploaded successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to save image path in the database.']);
+        }
+    }
+
+    public function deleteImage($userId)
+    {
+        session_start();
+
+        $this->load->helper('url');
+
+        $userId = $_SESSION["user_id"];
+
+        $this->load->model('ProfileModel');
+        
+        $user = $this->ProfileModel->get_user_profile($userId);
+
+        if (!empty($user['img'])) {
+
+            $imagePath = base_url($user['img']);
+
+            // Check if the file exists and delete it
+            if (file_exists($imagePath)) {
+                unlink($imagePath); // Delete the file
+            }
+
+            // Update the database to remove the image path
+            $this->ProfileModel->updateUser($userId, ['img' => null]);
+
+            echo json_encode(['status' => 'success', 'message' => 'Profile image deleted successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No profile image found to delete.']);
+        }
+    }
+
 }

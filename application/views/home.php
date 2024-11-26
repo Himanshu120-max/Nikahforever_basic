@@ -13,32 +13,54 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
 	<style>
 		body {
-			background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+			background: linear-gradient(135deg, #e9ecef, #dee2e6);
 			font-family: 'Arial', sans-serif;
 		}
 
+		.navbar {
+			background-color: #343a40;
+		}
+
+		.navbar-brand {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: #fff !important;
+		}
+
+		.navbar-nav .nav-link {
+			color: #adb5bd !important;
+			font-size: 1rem;
+			font-weight: bold;
+			margin: 0 0.5rem;
+			transition: color 0.3s ease-in-out;
+		}
+
+		.navbar-nav .nav-link:hover {
+			color: #f8f9fa !important;
+		}
+
 		.container {
-			padding: 2rem 1rem;
+			padding: 0rem 0.5rem;
 		}
 
 		.profile-card {
-			width: 20rem;
+			width: 22rem;
 			border: 1px solid #ddd;
 			border-radius: 12px;
 			overflow: hidden;
 			background-color: #ffffff;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 			transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 		}
 
 		.profile-card:hover {
 			transform: scale(1.05);
-			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+			box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
 		}
 
 		.profile-card img {
 			width: 100%;
-			height: 180px;
+			height: 200px;
 			object-fit: cover;
 			border-bottom: 2px solid #ddd;
 		}
@@ -50,15 +72,25 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 		.profile-card .card-title {
 			color: #1d3557;
-			font-size: 1.25rem;
+			font-size: 1.4rem;
 			font-weight: bold;
 			margin-bottom: 0.5rem;
 		}
 
 		.profile-card .card-text {
 			color: #495057;
-			font-size: 0.95rem;
-			margin: 0.3rem 0;
+			font-size: 1rem;
+			margin: 0.4rem 0;
+		}
+
+		.card-list {
+			list-style: none;
+			padding: 0;
+			margin: 0.5rem 0;
+		}
+
+		.card-list li {
+			margin: 0.2rem 0;
 		}
 
 		.btn {
@@ -85,43 +117,59 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			cursor: not-allowed;
 		}
 	</style>
-
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body>
-	<div class="container mt-5">
-
-		<!-- Links for View Profile and Interests Received -->
-		<div class="mb-4 text-center">
-			<a href="profile" class="btn btn-primary me-3">View Profile</a>
-			<a href="interest/received" class="btn btn-success">Interests Received</a>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-dark">
+		<div class="container">
+			<a class="navbar-brand" href="#">NikahForever</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="home">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="interest/received">Interest Received</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="profile">Profile</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="logout">Logout</a>
+					</li>
+				</ul>
+			</div>
 		</div>
+	</nav>
 
+	<!-- Main Content -->
+	<div class="container mt-5">
 		<!-- User Cards -->
 		<div class="row justify-content-center">
-			<!-- <?php echo "<pre>";
-			// print_r($users);
-			 ?> -->
 			<?php foreach ($users as $user): ?>
 				<?php $occupations = explode(',', $user['occupations']); ?>
 				<?php $educations = explode(',', $user['educations']); ?>
 				<div class="col-md-4 d-flex justify-content-center mb-4">
 					<div class="profile-card">
-						<img src="<?php echo base_url($user['img']); ?>" alt="Profile Picture">
+						<img src="<?php echo !empty($user['img']) ? base_url($user['img']) : 'https://placehold.co/600x400'; ?>" alt="Profile Picture">
 						<div class="card-body">
 							<h5 class="card-title"><?php echo htmlspecialchars($user['name']); ?></h5>
 							<p class="card-text"><strong>Income:</strong> <?php echo htmlspecialchars($user['income']); ?></p>
 							<p class="card-text"><strong>Height:</strong> <?php echo htmlspecialchars($user['height']); ?></p>
 							<p class="card-text"><strong>Date of Birth:</strong> <?php echo htmlspecialchars($user['dob']); ?></p>
 							<p class="card-text"><strong>Occupations:</strong></p>
-							<ul>
+							<ul class="card-list">
 								<?php foreach ($occupations as $occupation): ?>
 									<li><?php echo htmlspecialchars($occupation); ?></li>
 								<?php endforeach; ?>
 							</ul>
 							<p class="card-text"><strong>Educations:</strong></p>
-							<ul>
+							<ul class="card-list">
 								<?php foreach ($educations as $education): ?>
 									<li><?php echo htmlspecialchars($education); ?></li>
 								<?php endforeach; ?>
@@ -140,6 +188,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 		</div>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
 		$(document).ready(function() {
 			$('.btn-send-interest').click(function() {
@@ -171,8 +220,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			});
 		});
 	</script>
-
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

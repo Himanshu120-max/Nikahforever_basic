@@ -11,6 +11,10 @@ class Home extends CI_Controller
 		$this->load->helper('url');
 
 		$signedInUserId = $_SESSION['user_id']; // Replace with your session user ID key
+		
+		if(!$signedInUserId) {
+			redirect('login');
+		}
 
 		// Fetch all users except the signed-in user
 		$users = $this->RegisterModel->getAllUsersExceptSignedIn($signedInUserId);
@@ -30,7 +34,7 @@ class Home extends CI_Controller
 			$data['users'][$i]['dob'] = date('d-m-y', $data['users'][$i]['dob']);
 		}
 
-		$this->load->view('logout');
+		// $this->load->view('logout');	
 
 		// Load the view with the user data
 		$this->load->view('home', $data);

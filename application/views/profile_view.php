@@ -11,6 +11,28 @@
             font-family: 'Arial', sans-serif;
         }
 
+        .navbar {
+			background-color: #343a40;
+		}
+
+		.navbar-brand {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: #fff !important;
+		}
+
+		.navbar-nav .nav-link {
+			color: #adb5bd !important;
+			font-size: 1rem;
+			font-weight: bold;
+			margin: 0 0.5rem;
+			transition: color 0.3s ease-in-out;
+		}
+
+		.navbar-nav .nav-link:hover {
+			color: #f8f9fa !important;
+		}
+
         .container {
             max-width: 600px;
             margin: auto;
@@ -60,9 +82,7 @@
             padding: 1rem;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+        .btn-primary, .btn-danger {
             border-radius: 30px;
             font-size: 1rem;
             padding: 0.5rem 1.5rem;
@@ -71,6 +91,11 @@
 
         .btn-primary:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger:hover {
+            background-color: #b71c1c;
             transform: translateY(-2px);
         }
 
@@ -88,17 +113,62 @@
             font-size: 1rem;
             color: #495057;
         }
+
+        img {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">User Profile</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="d-flex justify-content-between w-100 px-4">
+            <div>
+                <a class="navbar-brand" href="home">NikahForever</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="interest/received">Interest Received</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container mt-2">
         <?php if (!empty($user)): ?>
             <div class="card mt-3">
                 <div class="card-header">
                     <h3>Profile Information</h3>
                 </div>
+                <!-- Display Image -->
+                <img src="<?php echo !empty($user['img']) ? base_url($user['img']) : 'https://placehold.co/600x400'; ?>" alt="Profile Picture">
+
+                <?php if (!empty($user['img'])): ?>
+                    <button id="deleteImageBtn" data-user-id="<?= $user['id']; ?>" class="btn btn-danger my-2">Delete Image</button>
+                <?php else: ?>
+                    <form id="uploadImageForm" enctype="multipart/form-data">
+                        <input type="file" class="form-control" id="imageFile" name="image" accept="image/*" required>
+                    <form>
+                    <button id="uploadImageBtn" data-user-id="<?= $user['id']; ?>" class="btn btn-primary my-2">Upload Image</button>
+                <?php endif; ?>
+                
                 <div class="card-body">
                     <p><strong>Name:</strong> <?= htmlspecialchars($user['name']); ?></p>
                     <p><strong>Email:</strong> <?= htmlspecialchars($user['email']); ?></p>
@@ -126,7 +196,8 @@
                         <?php endforeach; ?>
                     </ul>
                 </div>
-                <div class="card-footer">
+
+                <div class="card-footer justify-content-between">
                     <a href="<?= site_url('profile/edit/'.$user['id']); ?>" class="btn btn-primary">Edit Profile</a>
                 </div>
             </div>
@@ -136,5 +207,57 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#uploadImageForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: "<?= site_url('profile/uploadImage'); ?>",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        var result = JSON.parse(response);
+                        if (result.status === 'success') {
+                            window.location.replace("http://localhost/nikahforever/profile");
+                            // location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while uploading the image.');
+                    }
+                });
+            });
+
+            $('#deleteImageBtn').on('click', function () {
+                if (confirm('Are you sure you want to delete this profile image?')) {
+                    var userId = $(this).data('user-id');
+
+                    $.ajax({
+                        url: "<?= site_url('profile/deleteImage/'); ?>" + userId,
+                        type: 'POST',
+                        success: function (response) {
+                            var result = JSON.parse(response);
+                            if (result.status === 'success') {
+                                window.location.replace("http://localhost/nikahforever/profile");
+                                // location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        error: function () {
+                            alert('An error occurred while deleting the profile image.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
